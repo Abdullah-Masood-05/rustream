@@ -18,3 +18,7 @@ target/
 
 # Virtual environments
 .venv/
+
+# ONNX weights and models directory
+models/
+*.onnx
