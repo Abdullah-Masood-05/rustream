@@ -1,11 +1,14 @@
 import sys
 from pathlib import Path
+import pytest
+
+# Gracefully skip if OpenCV is not installed in the test environment
+cv2 = pytest.importorskip("cv2", reason="OpenCV is not installed")
 
 # Add project root to sys.path so examples can be imported
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
-import pytest
 import vigilo_stream
 from examples.live_opencv_hud import (
     draw_face_box,

@@ -32,6 +32,7 @@ Issues = "https://github.com/Abdullah-Masood-05/vigilo-stream/issues"
 dev = [
     "pytest>=7.0",
     "numpy>=1.20",
+    "opencv-python-headless>=4.5",
 ]
 
 [tool.maturin]

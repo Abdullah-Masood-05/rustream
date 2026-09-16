@@ -46,7 +46,7 @@ jobs:
       - name: Set up virtual environment and install dependencies
         run: |
           uv venv
-          uv pip install pytest numpy
+          uv pip install pytest numpy opencv-python-headless
 
       - name: Build and install rustream
         run: |
