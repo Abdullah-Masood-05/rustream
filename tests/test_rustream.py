@@ -19,15 +19,18 @@ from rustream import (
 
 
 def test_version():
-    assert rustream.__version__ == "0.1.0"
+    assert rustream.__version__ == "0.1.1"
 
 
 def test_vigilo_stream_import():
     import vigilo_stream
-    assert vigilo_stream.__version__ == "0.1.0"
+    assert vigilo_stream.__version__ == "0.1.1"
     assert vigilo_stream.Frame is rustream.Frame
     assert vigilo_stream.FusionEngine is rustream.FusionEngine
     assert vigilo_stream.Pipeline is rustream.Pipeline
+    assert "face_detection_yunet_2023mar.onnx" in vigilo_stream.MODEL_URLS
+    assert callable(vigilo_stream.download_models)
+    assert callable(rustream.download_models)
 
 
 def test_synthetic_frame_zero_copy():
@@ -150,7 +153,7 @@ def test_fusion_engine_replay_and_config():
 
 
 def test_pipeline_instantiation_and_context_manager():
-    with Pipeline() as pipeline:
+    with Pipeline(auto_download=False) as pipeline:
         assert not pipeline.is_running()
         assert pipeline.snapshot() is None
         assert pipeline.poll_frame() is None

@@ -1883,6 +1883,7 @@ dependencies = [
  "image",
  "ndarray",
  "openssl",
+ "openssl-sys",
  "pyo3",
  "serde",
  "serde_json",

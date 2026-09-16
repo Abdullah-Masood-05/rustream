@@ -29,7 +29,7 @@ You can import the library using either `vigilo_stream` or the `rustream` alias.
 import vigilo_stream
 import numpy as np
 
-# 1. Zero-copy frame operations
+# 1. Zero-copy frame operations (no neural model files required)
 frame = vigilo_stream.create_synthetic_frame(1280, 720, seq=1, r=255, g=0, b=0)
 print(frame.width, frame.height, frame.shape) # 1280 720 (720, 1280, 3)
 
@@ -38,6 +38,7 @@ arr = np.asarray(frame)
 assert arr.__array_interface__["data"][0] == frame.__array_interface__["data"][0]
 
 # 2. Vision and proctoring pipeline
+# Pipeline automatically downloads default model weights on first run
 with vigilo_stream.Pipeline(models_dir="models") as pipe:
     pipe.start("camera:0")  # Accepts "camera:0", "file:clip.mp4", or "dir:frames/"
 
@@ -54,10 +55,35 @@ with vigilo_stream.Pipeline(models_dir="models") as pipe:
         for event in events:
             print(f"Violation: {event}")
 
-# 3. Headless deterministic stream fusion
+# 3. Headless deterministic stream fusion (no neural models or camera required)
 engine = vigilo_stream.FusionEngine()
 events = engine.replay("recorded_session.jsonl")
 print(f"Replayed session produced {len(events)} events.")
+```
+
+## Model weights
+
+The neural pipeline uses ONNX Runtime models:
+- Face detection: YuNet (`face_detection_yunet_2023mar.onnx`)
+- Head pose: MobileNetV3 (`headpose_mobilenetv3_small.onnx`)
+- Gaze estimation: MobileGaze (`mobileone_s0_gaze.onnx`)
+- Object detection: YOLOX-Nano (`yolox_nano.onnx`)
+
+By default, `Pipeline(models_dir="models")` downloads missing models on first use. You can also download them explicitly:
+
+```python
+import vigilo_stream
+vigilo_stream.download_models("models")
+```
+
+Alternatively, download them using curl:
+
+```bash
+mkdir -p models
+curl -sSL -o models/face_detection_yunet_2023mar.onnx https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx
+curl -sSL -o models/headpose_mobilenetv3_small.onnx https://github.com/yakhyo/head-pose-estimation/releases/download/weights/mobilenetv3_small.onnx
+curl -sSL -o models/mobileone_s0_gaze.onnx https://github.com/yakhyo/gaze-estimation/releases/download/weights/mobileone_s0_gaze.onnx
+curl -sSL -o models/yolox_nano.onnx https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_nano.onnx
 ```
 
 ## Architecture
@@ -99,6 +125,12 @@ uv run pytest -v tests/
 ```
 
 ## Release notes
+
+### v0.1.1
+
+- Added `download_models()` helper to fetch default ONNX model weights automatically.
+- Enhanced `Pipeline` to download missing model files automatically on first use (`auto_download=True`).
+- Added `MODEL_URLS` mapping and updated documentation.
 
 ### v0.1.0
 

@@ -16,6 +16,8 @@ from vigilo_stream import (
     Signals,
     Violation,
     create_synthetic_frame,
+    download_models,
+    MODEL_URLS,
 )
 
 __all__ = [
@@ -32,4 +34,6 @@ __all__ = [
     "Signals",
     "Violation",
     "create_synthetic_frame",
+    "download_models",
+    "MODEL_URLS",
 ]

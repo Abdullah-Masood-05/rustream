@@ -52,7 +52,7 @@ mod _core {
 
     #[pymodule_init]
     fn init(m: &Bound<'_, PyModule>) -> PyResult<()> {
-        m.add("__version__", "0.1.0")?;
+        m.add("__version__", "0.1.1")?;
         m.add_class::<PyFrame>()?;
         m.add_class::<PyPipeline>()?;
         m.add_class::<PyFusionEngine>()?;
