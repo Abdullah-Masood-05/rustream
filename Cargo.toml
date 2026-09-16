@@ -1,9 +1,9 @@
 [package]
-name = "rustream"
+name = "vigilo-stream"
 version = "0.1.0"
 edition = "2021"
 license = "AGPL-3.0-only"
-description = "Zero-copy multi-modal stream fusion engine for real-time AI pipelines."
+description = "Zero-copy multi-modal stream fusion engine for real-time AI pipelines"
 
 [lib]
 name = "_core"

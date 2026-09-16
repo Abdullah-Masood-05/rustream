@@ -1,5 +1,6 @@
-# rustream
+# vigilo-stream
 
+[![PyPI](https://img.shields.io/badge/pypi-vigilo--stream-blue)](https://pypi.org/project/vigilo-stream/)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Rust](https://img.shields.io/badge/Rust-1.80+-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Maturin](https://img.shields.io/badge/Maturin-1.15-purple)](https://github.com/PyO3/maturin)
@@ -7,21 +8,29 @@
 
 Zero-copy multi-modal stream fusion engine for real-time AI pipelines in Python.
 
-`rustream` provides Python bindings for the stream fusion engine in [`vigilo-core`](https://github.com/Abdullah-Masood-05/vigilo-core). It gives Python vision and proctoring pipelines direct access to video frames and temporal rule evaluation without copying memory across the FFI boundary.
+`vigilo-stream` provides Python bindings for the stream fusion engine in [`vigilo-core`](https://github.com/Abdullah-Masood-05/vigilo-core). It gives Python vision and proctoring pipelines direct access to video frames and temporal rule evaluation without copying memory across the FFI boundary.
 
 - Zero-copy buffer sharing: Frame memory allocated in Rust is exposed directly to NumPy and PyTorch through `__array_interface__` and the buffer protocol.
 - Lock-free frame exchange: Capture workers publish frames through `ArcSwap` slots, discarding stale frames automatically instead of building queues.
 - Deterministic temporal fusion: The `FusionEngine` processes detection signals through configurable hysteresis bands, hold timers, and score accumulators. Given the same input, replay produces identical events.
 - Multimodal detection: Wraps the `vigilo-core` inference pipeline for face detection (YuNet), head pose (MobileNetV3), gaze estimation (MobileGaze), object detection (YOLOX-Nano), and identity matching (ArcFace).
 
+## Installation
+
+```bash
+pip install vigilo-stream
+```
+
+You can import the library using either `vigilo_stream` or the `rustream` alias.
+
 ## Quick start
 
 ```python
-import rustream
+import vigilo_stream
 import numpy as np
 
 # 1. Zero-copy frame operations
-frame = rustream.create_synthetic_frame(1280, 720, seq=1, r=255, g=0, b=0)
+frame = vigilo_stream.create_synthetic_frame(1280, 720, seq=1, r=255, g=0, b=0)
 print(frame.width, frame.height, frame.shape) # 1280 720 (720, 1280, 3)
 
 # Expose Rust memory directly as a NumPy array without copying
@@ -29,7 +38,7 @@ arr = np.asarray(frame)
 assert arr.__array_interface__["data"][0] == frame.__array_interface__["data"][0]
 
 # 2. Vision and proctoring pipeline
-with rustream.Pipeline(models_dir="models") as pipe:
+with vigilo_stream.Pipeline(models_dir="models") as pipe:
     pipe.start("camera:0")  # Accepts "camera:0", "file:clip.mp4", or "dir:frames/"
 
     while pipe.is_running():
@@ -46,7 +55,7 @@ with rustream.Pipeline(models_dir="models") as pipe:
             print(f"Violation: {event}")
 
 # 3. Headless deterministic stream fusion
-engine = rustream.FusionEngine()
+engine = vigilo_stream.FusionEngine()
 events = engine.replay("recorded_session.jsonl")
 print(f"Replayed session produced {len(events)} events.")
 ```
@@ -93,7 +102,7 @@ uv run pytest -v tests/
 
 ### v0.1.0
 
-- Initial release of `rustream` targeting Python 3.9 through 3.13.
+- Initial release of `vigilo-stream` (with `rustream` backward-compatibility alias) targeting Python 3.9 through 3.13.
 - Implemented `Frame` with `__array_interface__` and `memoryview()` support for zero-copy NumPy interop.
 - Implemented `FusionEngine` with single-frame stepping and deterministic JSONL log replay.
 - Implemented `Pipeline` context manager wrapping camera capture, detection workers, and event polling.

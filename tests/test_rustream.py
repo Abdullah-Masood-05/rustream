@@ -22,6 +22,14 @@ def test_version():
     assert rustream.__version__ == "0.1.0"
 
 
+def test_vigilo_stream_import():
+    import vigilo_stream
+    assert vigilo_stream.__version__ == "0.1.0"
+    assert vigilo_stream.Frame is rustream.Frame
+    assert vigilo_stream.FusionEngine is rustream.FusionEngine
+    assert vigilo_stream.Pipeline is rustream.Pipeline
+
+
 def test_synthetic_frame_zero_copy():
     # Create 640x480 RGB8 frame with known color (R=200, G=100, B=50)
     w, h = 640, 480

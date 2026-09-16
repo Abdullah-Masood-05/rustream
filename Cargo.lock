@@ -1433,21 +1433,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustream"
-version = "0.1.0"
-dependencies = [
- "arc-swap",
- "crossbeam-channel",
- "image",
- "ndarray",
- "pyo3",
- "serde",
- "serde_json",
- "toml",
- "vigilo-core",
-]
-
-[[package]]
 name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1877,6 +1862,21 @@ dependencies = [
  "toml",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "vigilo-stream"
+version = "0.1.0"
+dependencies = [
+ "arc-swap",
+ "crossbeam-channel",
+ "image",
+ "ndarray",
+ "pyo3",
+ "serde",
+ "serde_json",
+ "toml",
+ "vigilo-core",
 ]
 
 [[package]]

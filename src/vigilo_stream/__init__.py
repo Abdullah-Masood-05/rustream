@@ -1,8 +1,10 @@
 """
-rustream: Backward-compatibility wrapper for vigilo_stream.
+vigilo_stream: Zero-copy multi-modal stream fusion engine for real-time AI pipelines.
+
+Powered by vigilo-core, PyO3, and Maturin.
 """
 
-from vigilo_stream import (
+from ._core import (
     __version__,
     BBox,
     Event,

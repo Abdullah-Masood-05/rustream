@@ -1,5 +1,5 @@
 [project]
-name = "rustream"
+name = "vigilo-stream"
 version = "0.1.0"
 description = "Zero-copy multi-modal stream fusion engine for real-time AI pipelines"
 readme = "README.md"
@@ -25,9 +25,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Abdullah-Masood-05/rustream"
-Repository = "https://github.com/Abdullah-Masood-05/rustream"
-Issues = "https://github.com/Abdullah-Masood-05/rustream/issues"
+Homepage = "https://github.com/Abdullah-Masood-05/vigilo-stream"
+Repository = "https://github.com/Abdullah-Masood-05/vigilo-stream"
+Issues = "https://github.com/Abdullah-Masood-05/vigilo-stream/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -36,8 +36,8 @@ dev = [
 ]
 
 [tool.maturin]
-module-name = "rustream._core"
-python-packages = ["rustream"]
+module-name = "vigilo_stream._core"
+python-packages = ["vigilo_stream", "rustream"]
 python-source = "src"
 
 [tool.uv]
