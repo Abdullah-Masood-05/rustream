@@ -28,6 +28,8 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           manylinux: 2_28
+          before-script-linux: |
+            dnf install -y openssl-devel perl-core || yum install -y openssl-devel perl-core
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
