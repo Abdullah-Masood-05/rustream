@@ -9,6 +9,25 @@ authors = [
 ]
 requires-python = ">=3.9"
 dependencies = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 (AGPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+
+[project.urls]
+Homepage = "https://github.com/Abdullah-Masood-05/rustream"
+Repository = "https://github.com/Abdullah-Masood-05/rustream"
+Issues = "https://github.com/Abdullah-Masood-05/rustream/issues"
 
 [project.optional-dependencies]
 dev = [
