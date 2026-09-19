@@ -1,6 +1,6 @@
 [project]
 name = "vigilo-stream"
-version = "0.1.1"
+version = "1.0.0"
 description = "Zero-copy multi-modal stream fusion engine for real-time AI pipelines"
 readme = "README.md"
 license = "AGPL-3.0-only"

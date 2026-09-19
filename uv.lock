@@ -491,7 +491,7 @@ wheels = [
 
 [[package]]
 name = "vigilo-stream"
-version = "0.1.1"
+version = "1.0.0"
 source = { editable = "." }
 
 [package.optional-dependencies]

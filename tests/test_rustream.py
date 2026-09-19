@@ -19,12 +19,12 @@ from rustream import (
 
 
 def test_version():
-    assert rustream.__version__ == "0.1.1"
+    assert rustream.__version__ == "1.0.0"
 
 
 def test_vigilo_stream_import():
     import vigilo_stream
-    assert vigilo_stream.__version__ == "0.1.1"
+    assert vigilo_stream.__version__ == "1.0.0"
     assert vigilo_stream.Frame is rustream.Frame
     assert vigilo_stream.FusionEngine is rustream.FusionEngine
     assert vigilo_stream.Pipeline is rustream.Pipeline
