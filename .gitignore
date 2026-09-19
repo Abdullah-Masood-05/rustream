@@ -22,3 +22,9 @@ target/
 # ONNX weights and models directory
 models/
 *.onnx
+
+# Node and VitePress build artifacts
+node_modules/
+.vitepress/dist/
+.vitepress/cache/
+

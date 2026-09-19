@@ -1,0 +1,5 @@
+# Treat documentation site files as documentation so they do not count
+# toward repository language statistics in GitHub's language bar.
+docs/** linguist-documentation=true
+docs/** linguist-vendored=true
+examples/** linguist-documentation=true
