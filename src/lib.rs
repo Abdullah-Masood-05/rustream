@@ -43,12 +43,28 @@ fn create_synthetic_frame(
     PyFrame::new(frame)
 }
 
+/// Returns the execution provider name and whether hardware acceleration is enabled in this build.
+#[pyfunction]
+fn device_info() -> PyResult<(String, bool)> {
+    #[cfg(feature = "gpu-directml")]
+    return Ok(("DirectML".to_string(), true));
+    #[cfg(feature = "gpu-cuda")]
+    return Ok(("CUDA".to_string(), true));
+    #[cfg(feature = "gpu-coreml")]
+    return Ok(("CoreML".to_string(), true));
+    #[cfg(not(any(feature = "gpu-directml", feature = "gpu-cuda", feature = "gpu-coreml")))]
+    return Ok(("CPU".to_string(), false));
+}
+
 #[pymodule]
 mod _core {
     use super::*;
 
     #[pymodule_export]
     use super::create_synthetic_frame;
+
+    #[pymodule_export]
+    use super::device_info;
 
     #[pymodule_init]
     fn init(m: &Bound<'_, PyModule>) -> PyResult<()> {

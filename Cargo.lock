@@ -1857,7 +1857,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 [[package]]
 name = "vigilo-core"
 version = "0.2.0"
-source = "git+https://github.com/Abdullah-Masood-05/vigilo-core.git?branch=main#d32552072de256a12a0c4967f9976420109a9bd7"
+source = "git+https://github.com/Abdullah-Masood-05/vigilo-core.git?branch=main#355c4dac9ced7c34d0a489f2bbabeaf25ffa2716"
 dependencies = [
  "arc-swap",
  "clap",

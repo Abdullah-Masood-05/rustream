@@ -1,95 +1,116 @@
 # Hardware & GPU acceleration
 
-This page outlines the execution provider architecture, comparing the default CPU-optimized build with discrete GPU acceleration across different operating systems.
-
-## Current build: CPU-optimized
-
-The default `vigilo-stream` PyPI package is built and optimized for CPU execution:
-
-- **Package size**: ~18 MB wheel.
-- **Dependencies**: No external GPU runtimes, CUDA drivers, or DirectX 12 DLLs required.
-- **Latency**: ~12 to 18 ms face detection p50 on modern x86_64 and Apple Silicon processors.
-- **Compatibility**: Runs out of the box on Windows, Ubuntu, Debian, macOS (arm64 and x86_64), and containerized CI environments.
-
-For standard proctoring at 30 fps, the CPU-optimized build comfortably meets real-time latency budgets.
+`vigilo-stream` provides a hybrid, high-efficiency architecture: a **lightweight CPU-optimized default install** combined with **on-demand GPU acceleration** across Windows, Linux, and macOS.
 
 ---
 
-## Discrete GPU acceleration
-
-Discrete GPU acceleration offloads tensor computations to dedicated hardware accelerators, providing lower latency, higher frame throughput, and reduced CPU utilization.
-
-### OS-specific acceleration targets
-
-Different operating systems require different acceleration backends. Bundling a Windows-specific GPU backend into Linux or macOS packages is ineffective and unnecessarily increases binary size:
-
-| Platform | Recommended execution provider | Hardware support | Prerequisites |
-| :--- | :--- | :--- | :--- |
-| **Windows** | **DirectML** (DirectX 12) | NVIDIA, AMD Radeon, Intel Arc | Windows 10/11, DirectX 12 GPU |
-| **macOS** | **CoreML** (Metal / ANE) | Apple Silicon (M1/M2/M3/M4) | macOS 12+, Apple Silicon |
-| **Linux** | **CUDA / TensorRT** | NVIDIA discrete GPUs | NVIDIA driver, CUDA toolkit |
-
-### DirectML on Windows
-
-The `gpu-directml` branch in the desktop engine uses Microsoft DirectML. DirectML is built on DirectX 12, allowing it to accelerate neural networks across all major GPU vendors on Windows (NVIDIA GeForce, AMD Radeon, and Intel Arc) without requiring proprietary CUDA installations.
-
-#### DirectML configuration rules
-
-When using DirectML with ONNX Runtime, specific session options are mandatory:
-
-```rust
-// DirectML requires single-thread execution and disables memory-pattern planning
-let builder = Session::builder()?
-    .with_parallel_execution(false)?
-    .with_memory_pattern(false)?
-    .with_execution_providers([
-        ep::DirectML::default().build().error_on_failure()
-    ])?;
-```
-
-- **Dynamic axis pinning**: DirectML partitions subgraphs at session initialization. Any dynamic dimension (e.g. batch size) must be pinned ahead of time, or the subgraph silently falls back to CPU execution.
-- **Error on failure**: DirectML is configured with `error_on_failure()` so that if an unsupported device or driver is encountered, the system detects the failure explicitly and falls back gracefully to the CPU provider.
-
----
-
-## Packaging strategy: CPU vs GPU
-
-Bundling GPU backends directly into a single universal wheel introduces significant trade-offs:
-- DirectML adds `DirectML.dll` (~18 MB) plus larger ONNX Runtime static libraries, nearly tripling the wheel size to ~50 MB.
-- Linux and macOS wheels cannot use DirectML, making those extra megabytes dead weight on non-Windows machines.
-
-### Proposed packaging options
+## CPU vs GPU architecture
 
 ```mermaid
 graph TD
-    subgraph PyPI Packages
-        A[pip install vigilo-stream] --> B[CPU Optimized Default: ~18 MB]
-        C[pip install vigilo-stream-directml] --> D[Windows DirectML GPU: ~50 MB]
-        E[pip install vigilo-stream-cuda] --> F[Linux NVIDIA CUDA: ~60 MB]
+    A[pip install vigilo-stream] --> B[Default CPU Wheel: ~18 MB]
+    
+    subgraph Python Runtime
+        B --> C{Pipeline device flag}
+        C -->|device='cpu'| D[Fast In-Memory CPU Engine]
+        C -->|device='auto'| E[Use GPU if cached, otherwise CPU]
+        C -->|device='gpu'| F{GPU cached locally?}
+        F -->|Yes| G[Dynamic Load _core_gpu]
+        F -->|No| H[On-Demand Download from GitHub Releases]
+        H --> G
     end
 
-    subgraph Runtime
-        B --> G[import vigilo_stream]
-        D --> G
-        F --> G
-        G --> H[Identical Python API & Automatic CPU Fallback]
+    subgraph OS Hardware Execution Providers
+        G -->|Windows| I[DirectML - DirectX 12]
+        G -->|Linux| J[CUDA - NVIDIA GPUs]
+        G -->|macOS| K[CoreML - Apple Silicon / Metal]
     end
 ```
 
-### Option 1: Dual PyPI package (Recommended)
-- **`vigilo-stream`**: Default lightweight CPU build (cross-platform, ~18 MB).
-- **`vigilo-stream-directml`**: Windows-specific wheel containing DirectML GPU acceleration with automatic CPU fallback if no DirectX 12 hardware is found.
-- Both packages share the exact same module name (`vigilo_stream`) so application code remains unchanged.
+---
 
-This approach mirrors the packaging model used by `onnxruntime` vs `onnxruntime-directml` and `torch+cpu` vs `torch+cu121`.
+## Why on-demand GPU download?
 
-### Option 2: Feature-gated source builds
-Users who want GPU acceleration can compile from source with Cargo feature flags:
+Bundling GPU runtime binaries (like `DirectML.dll`, NVIDIA CUDA libraries, or CoreML wrappers) directly inside the universal PyPI wheel bloats the package size from ~18 MB to over ~60 MB. Furthermore:
+- A Windows DirectML binary is useless dead weight on Linux and macOS.
+- Users on CPU-only laptops or cloud servers should not be forced to download large GPU runtimes.
+
+With `vigilo-stream`'s on-demand architecture:
+1. **`pip install vigilo-stream` is fast and small (~18 MB)**: installs in seconds anywhere.
+2. **GPU binaries are downloaded only when requested**: just like default ONNX model weights (`download_models()`), the GPU backend is cached locally in `~/.cache/vigilo_stream/backends/` on first use.
+3. **Zero configuration**: no manual driver compilation or complex environment variables needed.
+
+---
+
+## OS-specific execution providers
+
+| Platform | Execution provider | Hardware support | Prerequisites |
+| :--- | :--- | :--- | :--- |
+| **Windows** | **DirectML** (DirectX 12) | NVIDIA, AMD Radeon, Intel Arc, Qualcomm Adreno | Windows 10/11, DirectX 12 GPU |
+| **Linux** | **CUDA** | NVIDIA discrete GPUs | NVIDIA driver, CUDA toolkit |
+| **macOS** | **CoreML** (Metal / ANE) | Apple Silicon (M1/M2/M3/M4) | macOS 12+, Apple Silicon |
+
+---
+
+## Using GPU acceleration in Python
+
+### 1. In the Pipeline constructor
+
+Set `device="gpu"` or `device="auto"`:
+
+```python
+from vigilo_stream import Pipeline
+
+# device="gpu": requires GPU acceleration (downloads backend on first call if missing)
+pipeline = Pipeline(source_spec="camera:0", device="gpu")
+
+# device="auto": uses GPU if already cached/available, otherwise seamlessly runs on CPU
+pipeline = Pipeline(source_spec="camera:0", device="auto")
+
+# device="cpu": always uses lightweight CPU execution (zero downloads)
+pipeline = Pipeline(source_spec="camera:0", device="cpu")
+```
+
+### 2. Checking hardware support programmatically
+
+```python
+import vigilo_stream
+
+# Check if current hardware supports GPU acceleration
+supported, reason = vigilo_stream.detect_gpu_support()
+print(f"GPU Supported: {supported} ({reason})")
+
+# Query active execution provider
+provider, is_gpu = vigilo_stream.device_info()
+print(f"Active Provider: {provider}, GPU Enabled: {is_gpu}")
+```
+
+### 3. Explicitly enabling GPU backend
+
+```python
+import vigilo_stream
+
+# Downloads GPU backend if missing, then activates it
+success = vigilo_stream.enable_gpu(verbose=True)
+if success:
+    print("GPU acceleration active!")
+else:
+    print("Running on CPU.")
+```
+
+---
+
+## Compiling from source with GPU features
+
+If you are developing locally or building custom wheels, you can compile with Cargo feature flags directly:
 
 ```bash
 # Windows DirectML build
-maturin develop --features directml
+maturin develop --features gpu-directml
 
 # Linux CUDA build
-maturin develop --features cuda
+maturin develop --features gpu-cuda
+
+# macOS CoreML build
+maturin develop --features gpu-coreml
 ```

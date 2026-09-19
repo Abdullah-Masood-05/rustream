@@ -9,6 +9,7 @@ class Pipeline:
         config_path: Optional[str] = None,
         models_dir: Optional[str] = "models",
         auto_download: bool = True,
+        device: str = "auto",
     ) -> None: ...
 ```
 
@@ -21,10 +22,14 @@ Initializes a new capture and inference pipeline.
   - `config_path` (*Optional[str]*): Path to a custom TOML configuration file. If `None`, default settings are used.
   - `models_dir` (*Optional[str]*): Directory containing the ONNX model files. Defaults to `"models"`.
   - `auto_download` (*bool*): If `True`, automatically downloads any missing model weights from official repositories into `models_dir` on first use. Defaults to `True`.
+  - `device` (*str*): Execution target preference:
+    - `"auto"` (default): Uses GPU acceleration if available and cached, otherwise runs on CPU.
+    - `"gpu"`: Requires GPU acceleration. Automatically downloads the platform-specific GPU runtime backend from GitHub Releases on first use if not already cached.
+    - `"cpu"`: Always uses the lightweight CPU-optimized engine with zero external downloads.
 - **Raises**:
   - `IOError`: If `config_path` is specified but cannot be read.
   - `ValueError`: If the TOML configuration is malformed.
-  - `RuntimeError`: If the neural detector cannot be built (e.g. invalid ONNX files or missing required models).
+  - `RuntimeError`: If the neural detector cannot be built, or if `device="gpu"` is requested but no supported hardware or backend is available.
 
 ---
 

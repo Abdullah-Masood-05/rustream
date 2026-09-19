@@ -23,6 +23,56 @@ from ._core import (
     Violation,
     create_synthetic_frame,
 )
+from .gpu import (
+    detect_gpu_support,
+    download_gpu_backend,
+    is_gpu_cached,
+    load_gpu_backend,
+)
+
+_active_core = _core
+
+
+def device_info() -> tuple[str, bool]:
+    """Return the currently active execution provider and whether hardware acceleration is enabled."""
+    global _active_core
+    if hasattr(_active_core, "device_info"):
+        return _active_core.device_info()
+    return ("CPU", False)
+
+
+def enable_gpu(verbose: bool = True) -> bool:
+    """Attempt to enable GPU acceleration, downloading backend binaries if necessary.
+
+    Returns:
+        True if GPU backend was successfully loaded, False otherwise.
+    """
+    global _active_core
+    supported, reason = detect_gpu_support()
+    if not supported:
+        if verbose:
+            print(f"GPU acceleration unavailable: {reason}. Using CPU.")
+        return False
+
+    if not is_gpu_cached(__version__):
+        try:
+            download_gpu_backend(__version__, verbose=verbose)
+        except Exception as e:
+            if verbose:
+                print(f"Failed to download GPU backend: {e}. Falling back to CPU.")
+            return False
+
+    try:
+        gpu_mod = load_gpu_backend(__version__)
+        _active_core = gpu_mod
+        if verbose:
+            print(f"GPU backend enabled: {device_info()[0]}")
+        return True
+    except Exception as e:
+        if verbose:
+            print(f"Failed to load GPU backend: {e}. Falling back to CPU.")
+        return False
+
 
 MODEL_URLS = {
     "face_detection_yunet_2023mar.onnx": "https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx",
@@ -54,6 +104,13 @@ class Pipeline:
     and ONNX inference workers. By default, auto_download=True automatically
     downloads missing default model weights (such as YuNet face detection)
     into models_dir on first use.
+
+    Args:
+        config_path: Path to optional custom configuration TOML.
+        models_dir: Directory where ONNX models are stored.
+        auto_download: Automatically download default model weights if missing.
+        device: 'auto' (use GPU if available/cached, otherwise CPU),
+                'gpu' (download and use GPU acceleration), or 'cpu'.
     """
 
     def __init__(
@@ -61,6 +118,7 @@ class Pipeline:
         config_path: Optional[str] = None,
         models_dir: str = "models",
         auto_download: bool = True,
+        device: str = "auto",
     ):
         self.models_dir = models_dir
         if auto_download:
@@ -69,7 +127,18 @@ class Pipeline:
             if not primary_model.exists():
                 download_models(dest_dir=models_dir, verbose=True)
 
-        self._inner = _core.Pipeline(config_path=config_path, models_dir=models_dir)
+        # Handle device preference
+        core = _active_core
+        if device == "gpu":
+            if not enable_gpu(verbose=True):
+                raise RuntimeError("GPU acceleration was requested (device='gpu'), but could not be initialized.")
+            core = _active_core
+        elif device == "auto":
+            if is_gpu_cached(__version__):
+                enable_gpu(verbose=False)
+                core = _active_core
+
+        self._inner = core.Pipeline(config_path=config_path, models_dir=models_dir)
 
     def start(self, source_spec: str):
         """Start processing from a video source specification (e.g. 'camera:0', 'file:clip.mp4')."""
@@ -133,4 +202,10 @@ __all__ = [
     "create_synthetic_frame",
     "download_models",
     "MODEL_URLS",
+    "detect_gpu_support",
+    "device_info",
+    "download_gpu_backend",
+    "enable_gpu",
+    "is_gpu_cached",
 ]
+

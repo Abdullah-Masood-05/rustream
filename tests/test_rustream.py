@@ -153,9 +153,30 @@ def test_fusion_engine_replay_and_config():
 
 
 def test_pipeline_instantiation_and_context_manager():
-    with Pipeline(auto_download=False) as pipeline:
+    with Pipeline(auto_download=False, device="cpu") as pipeline:
         assert not pipeline.is_running()
         assert pipeline.snapshot() is None
         assert pipeline.poll_frame() is None
         assert pipeline.events() == []
         assert not pipeline.is_enrolled()
+
+    with Pipeline(auto_download=False, device="auto") as pipeline:
+        assert not pipeline.is_running()
+
+
+def test_gpu_detection_and_device_handling():
+    import vigilo_stream
+
+    is_supported, reason = vigilo_stream.detect_gpu_support()
+    assert isinstance(is_supported, bool)
+    assert isinstance(reason, str)
+
+    provider, is_gpu = vigilo_stream.device_info()
+    assert isinstance(provider, str)
+    assert isinstance(is_gpu, bool)
+    assert provider == "CPU"
+    assert is_gpu is False
+
+    is_cached = vigilo_stream.is_gpu_cached(vigilo_stream.__version__)
+    assert isinstance(is_cached, bool)
+

@@ -18,6 +18,11 @@ from vigilo_stream import (
     create_synthetic_frame,
     download_models,
     MODEL_URLS,
+    detect_gpu_support,
+    device_info,
+    download_gpu_backend,
+    enable_gpu,
+    is_gpu_cached,
 )
 
 __all__ = [
@@ -36,4 +41,10 @@ __all__ = [
     "create_synthetic_frame",
     "download_models",
     "MODEL_URLS",
+    "detect_gpu_support",
+    "device_info",
+    "download_gpu_backend",
+    "enable_gpu",
+    "is_gpu_cached",
 ]
+
