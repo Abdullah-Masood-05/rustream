@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#b45309" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <!-- Outer shield / reticle ring -->
+  <circle cx="50" cy="50" r="44" stroke="url(#amberGrad)" stroke-width="3" stroke-dasharray="8 4" opacity="0.6"/>
+  <!-- Inner targeting reticle -->
+  <circle cx="50" cy="50" r="32" stroke="#f59e0b" stroke-width="2" opacity="0.85"/>
+  <!-- Central pulse node -->
+  <circle cx="50" cy="50" r="8" fill="url(#amberGrad)"/>
+  <!-- Stream chevrons / rays -->
+  <path d="M 50 14 L 50 26 M 50 74 L 50 86 M 14 50 L 26 50 M 74 50 L 86 50" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+  <!-- Diagonal focal ticks -->
+  <path d="M 28 28 L 36 36 M 72 28 L 64 36 M 28 72 L 36 64 M 72 72 L 64 64" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+</svg>
