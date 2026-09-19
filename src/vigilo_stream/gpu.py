@@ -90,15 +90,15 @@ def is_gpu_cached(version: str) -> bool:
     cache_dir = get_gpu_cache_dir(version)
     if not cache_dir.exists():
         return False
-    ext = ".pyd" if sys.platform == "win32" else ".so"
-    return any(cache_dir.glob(f"*_core*{ext}"))
+    exts = (".pyd",) if sys.platform == "win32" else (".so", ".dylib")
+    return any(f.suffix in exts and "_core" in f.name for f in cache_dir.rglob("*"))
 
 
 def download_gpu_backend(version: str, verbose: bool = True) -> Path:
     """Download the platform GPU backend archive from GitHub Releases.
 
     Args:
-        version: Package version (e.g. '0.1.1')
+        version: Package version (e.g. '1.0.0')
         verbose: Whether to print download progress
 
     Returns:
@@ -148,7 +148,7 @@ def load_gpu_backend(version: str) -> Any:
     """Dynamically load the GPU-enabled _core native module from the cache directory.
 
     Args:
-        version: Package version (e.g. '0.1.1')
+        version: Package version (e.g. '1.0.0')
 
     Returns:
         The loaded GPU _core module
@@ -157,18 +157,21 @@ def load_gpu_backend(version: str) -> Any:
     if not cache_dir.exists():
         raise FileNotFoundError(f"GPU cache directory does not exist: {cache_dir}")
 
-    if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
-        try:
-            os.add_dll_directory(str(cache_dir.resolve()))
-        except OSError:
-            pass
-
-    ext = ".pyd" if sys.platform == "win32" else ".so"
-    candidates = list(cache_dir.glob(f"*_core*{ext}"))
+    exts = (".pyd",) if sys.platform == "win32" else (".so", ".dylib")
+    candidates = [f for f in cache_dir.rglob("*") if f.suffix in exts and "_core" in f.name]
     if not candidates:
-        raise FileNotFoundError(f"No GPU native binary (*_core*{ext}) found in {cache_dir}")
+        raise FileNotFoundError(f"No GPU native binary (*_core* in {exts}) found in {cache_dir}")
 
     gpu_lib_path = candidates[0]
+
+    # On Windows, add both cache_dir and the library directory to DLL search path
+    if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
+        for d in {cache_dir.resolve(), gpu_lib_path.parent.resolve()}:
+            try:
+                os.add_dll_directory(str(d))
+            except OSError:
+                pass
+
     module_name = "vigilo_stream._core_gpu"
 
     spec = importlib.util.spec_from_file_location(module_name, str(gpu_lib_path))
@@ -179,3 +182,4 @@ def load_gpu_backend(version: str) -> Any:
     sys.modules[module_name] = mod
     spec.loader.exec_module(mod)
     return mod
+

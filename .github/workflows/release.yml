@@ -66,7 +66,7 @@ jobs:
           mkdir -p gpu-bundle
           cp target/release/_core.dll gpu-bundle/_core_gpu.pyd
           find target/release -maxdepth 1 -name "*.dll" -exec cp {} gpu-bundle/ \;
-          cd gpu-bundle && zip -r ../dist/vigilo-stream-gpu-windows-x86_64.zip .
+          cd gpu-bundle && 7z a -tzip ../dist/vigilo-stream-gpu-windows-x86_64.zip .
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -91,7 +91,7 @@ jobs:
           args: --release --out dist --find-interpreter
       - name: Build GPU backend (CoreML)
         run: |
-          cargo build --release --features gpu-coreml
+          RUSTFLAGS="-C link-arg=-undefined -C link-arg=dynamic_lookup" cargo build --release --features gpu-coreml
           mkdir -p gpu-bundle
           cp target/release/lib_core.dylib gpu-bundle/_core_gpu.so || true
           find target/release -maxdepth 1 -name "*.dylib*" -exec cp {} gpu-bundle/ \;
