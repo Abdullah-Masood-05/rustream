@@ -306,19 +306,14 @@ uv run pytest -v tests/
 
 ### v1.0.1
 
-- Updated documentation links and PyPI project URLs.
-- Enhanced README with embedded documentation links.
-
-### v1.0.0
-
-- Added cross-platform on-demand GPU acceleration architecture:
-  - **Windows**: DirectML (DirectX 12) acceleration for NVIDIA, AMD, Intel Arc, and Qualcomm GPUs.
+- **Cross-Platform On-Demand GPU Acceleration**:
+  - **Windows**: Microsoft DirectML (DirectX 12) acceleration for NVIDIA, AMD, Intel Arc, and Qualcomm GPUs.
   - **Linux**: NVIDIA CUDA acceleration.
-  - **macOS**: CoreML / Metal acceleration for Apple Silicon.
-- Introduced dynamic hardware detection (`detect_gpu_support()`) and on-demand GPU backend downloading (`download_gpu_backend()`), keeping the default PyPI package lightweight (~18 MB).
-- Added `device="auto"`, `device="gpu"`, and `device="cpu"` parameters to `Pipeline`.
-- Added runtime provider inspection via `device_info()`.
-- Added full VitePress documentation website with dark/light themes and published to GitHub Pages.
+  - **macOS**: Apple CoreML / Metal acceleration for Apple Silicon (M1–M4).
+- **Dynamic Hardware Detection & Lazy Download**: Keeps default PyPI package lightweight (~18 MB); downloads platform GPU runtimes on first use when requested.
+- **Multi-Device Pipeline Support**: Added `device="auto"`, `device="gpu"`, and `device="cpu"` parameters to `Pipeline`.
+- **Runtime Provider Inspection**: Added `device_info()`, `detect_gpu_support()`, and `enable_gpu()` APIs.
+- **Official Documentation Site**: Full VitePress documentation website with dark/light themes published to GitHub Pages.
 
 ### v0.1.1
 
