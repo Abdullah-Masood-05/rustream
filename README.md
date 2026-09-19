@@ -1,6 +1,7 @@
 # vigilo-stream
 
 [![PyPI](https://img.shields.io/badge/pypi-vigilo--stream-blue)](https://pypi.org/project/vigilo-stream/)
+[![Documentation](https://img.shields.io/badge/docs-vigilo--stream-orange?logo=vitepress)](https://abdullah-masood-05.github.io/vigilo-stream/)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Rust](https://img.shields.io/badge/Rust-1.80+-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Maturin](https://img.shields.io/badge/Maturin-1.15-purple)](https://github.com/PyO3/maturin)
@@ -14,6 +15,20 @@ Zero-copy multi-modal stream fusion engine for real-time AI pipelines in Python.
 - Lock-free frame exchange: Capture workers publish frames through `ArcSwap` slots, discarding stale frames automatically instead of building queues.
 - Deterministic temporal fusion: The `FusionEngine` processes detection signals through configurable hysteresis bands, hold timers, and score accumulators. Given the same input, replay produces identical events.
 - Multimodal detection: Wraps the `vigilo-core` inference pipeline for face detection (YuNet), head pose (MobileNetV3), gaze estimation (MobileGaze), object detection (YOLOX-Nano), and identity matching (ArcFace).
+
+## Documentation
+
+Comprehensive usage guides and API references are available at the documentation site:
+
+**[https://abdullah-masood-05.github.io/vigilo-stream/](https://abdullah-masood-05.github.io/vigilo-stream/)**
+
+- [Getting started and installation](https://abdullah-masood-05.github.io/vigilo-stream/guide/getting-started)
+- [Zero-copy memory sharing](https://abdullah-masood-05.github.io/vigilo-stream/guide/zero-copy)
+- [Pipeline lifecycle](https://abdullah-masood-05.github.io/vigilo-stream/guide/pipeline)
+- [Fusion engine and replay](https://abdullah-masood-05.github.io/vigilo-stream/guide/fusion-engine)
+- [Live OpenCV HUD](https://abdullah-masood-05.github.io/vigilo-stream/guide/opencv-hud)
+- [Python API reference](https://abdullah-masood-05.github.io/vigilo-stream/api/pipeline)
+- [Hardware and GPU acceleration](https://abdullah-masood-05.github.io/vigilo-stream/hardware/acceleration)
 
 ## Installation
 
