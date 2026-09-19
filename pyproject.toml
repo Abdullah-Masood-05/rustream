@@ -1,6 +1,6 @@
 [project]
 name = "vigilo-stream"
-version = "1.0.0"
+version = "1.0.1"
 description = "Zero-copy multi-modal stream fusion engine for real-time AI pipelines"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -25,6 +25,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/Abdullah-Masood-05/vigilo-stream"
+Documentation = "https://abdullah-masood-05.github.io/vigilo-stream/"
 Repository = "https://github.com/Abdullah-Masood-05/vigilo-stream"
 Issues = "https://github.com/Abdullah-Masood-05/vigilo-stream/issues"
 

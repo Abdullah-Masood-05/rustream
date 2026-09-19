@@ -18,9 +18,7 @@ Zero-copy multi-modal stream fusion engine for real-time AI pipelines in Python.
 
 ## Documentation
 
-Comprehensive usage guides and API references are available at the documentation site:
-
-**[https://abdullah-masood-05.github.io/vigilo-stream/](https://abdullah-masood-05.github.io/vigilo-stream/)**
+Comprehensive usage guides and API references are available in the **[Documentation](https://abdullah-masood-05.github.io/vigilo-stream/)**:
 
 - [Getting started and installation](https://abdullah-masood-05.github.io/vigilo-stream/guide/getting-started)
 - [Zero-copy memory sharing](https://abdullah-masood-05.github.io/vigilo-stream/guide/zero-copy)
@@ -305,6 +303,11 @@ uv run pytest -v tests/
 ```
 
 ## Release notes
+
+### v1.0.1
+
+- Updated documentation links and PyPI project URLs.
+- Enhanced README with embedded documentation links.
 
 ### v1.0.0
 
